@@ -34,8 +34,6 @@ int main(void) {
 
 	increaseClock(1, 1000000000);
 	printf("%d:%d seconds:nanoseconds\n", sysClockptr->seconds, sysClockptr->nanoseconds);
-
-	printf("Hello World\n");
 	
 	removeSHM();
 
