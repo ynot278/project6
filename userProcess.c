@@ -30,6 +30,8 @@ static int setUpSHM(){
 		perror("oss error: shmat sysClockptr");
 		return -1;
 	}
+
+	return 0;
 }
 
 int main(const int argc, char *const arv[]){
