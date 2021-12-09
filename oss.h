@@ -6,24 +6,8 @@ typedef struct sysClock{
 	unsigned int nanoseconds;
 } sysClock;
 
-sysClock *sysClockptr;
+static sysClock *sysClockptr;
 int shmClockid;
-
-static int setUpSHM(){
-	shmClockid = shmget(8837, sizeof(sysClock), IPC_CREAT | IPC_EXCL | 0666);
-	if(shmClockid == -1){
-		perror("error: shmget shmClockid");
-		return -1;
-	}
-
-	sysClockptr = shmat(shmClockid, NULL, 0);
-	if(sysClockptr == (void *) -1){
-		perror("error: shmat sysClockptr");
-		return -1;
-	}
-
-	return 0;
-}
 
 static void removeSHM(){
 	if(shmdt(sysClockptr) == -1){
@@ -35,12 +19,18 @@ static void removeSHM(){
 	}
 }
 
+void increaseClock(unsigned int min, unsigned int max){
+	int timeIncrease;
+	int temp;
 
+	timeIncrease = (unsigned int) (rand() % max + min);
 
-
-
-
-
+	if ((sysClockptr->nanoseconds + timeIncrease) > 1000000000){
+		temp = (sysClockptr->nanoseconds + timeIncrease) - 1000000000;
+		sysClockptr->nanoseconds = temp;
+		sysClockptr->seconds += 1;
+	} else sysClockptr->nanoseconds += timeIncrease;
+}
 
 
 
