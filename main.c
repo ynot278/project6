@@ -29,7 +29,15 @@ static int setUpSHM(){
 		perror("oss error: shmat sysClockptr");
 		return -1;
 	}
+	return 0;
+}
 
+static int setUPmsgQ(){
+	msgid = msgget(1220, 0666 | IPC_CREAT);
+	if (msgid == -1){
+		perror("userProcess error: msgid");
+		return -1;
+	}
 	return 0;
 }
 
@@ -40,6 +48,7 @@ int main(void) {
 	pid_t pid;
 
   setUpSHM();
+	setUPmsgQ();
 
 	increaseClock(1, 1000000000);
 	printf("%d:%d seconds:nanoseconds in parent\n", sysClockptr->seconds, sysClockptr->nanoseconds);
@@ -49,9 +58,8 @@ int main(void) {
 		execl("userProcess", "userProcess", NULL);
 	} else{
 		printf("this is parent\n");
+		
 	}
-	
-	//removeSHM();
 
 	return 0;
 }

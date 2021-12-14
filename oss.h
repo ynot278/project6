@@ -6,8 +6,15 @@ typedef struct sysClock{
 	unsigned int nanoseconds;
 } sysClock;
 
+struct mesg_buffer{
+	long mesg_type;
+    char mesg_text[100];
+} message;
+
 static sysClock *sysClockptr;
 int shmClockid;
+
+int msgid;
 
 static void removeSHM(){
 	if(shmdt(sysClockptr) == -1){
@@ -16,6 +23,12 @@ static void removeSHM(){
 
 	if(shmctl(shmClockid, IPC_RMID, NULL) == -1){
 		perror("error: shmctl shmClockid");
+	}
+}
+
+static void removeMsgQ(){
+	if(msgctl(msgid, IPC_RMID, NULL) == -1){
+		perror("error: msgctl msgid");
 	}
 }
 

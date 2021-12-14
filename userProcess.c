@@ -21,16 +21,24 @@
 static int setUpSHM(){
 	shmClockid = shmget(8837, 0, 0);
 	if (shmClockid == -1){
-		perror("userProcess: shmget shmClockid");
+		perror("userProcess error: shmget shmClockid");
 		return -1;
 	}
 
 	sysClockptr = shmat(shmClockid, NULL, 0);
 	if(sysClockptr == (void *) -1){
-		perror("oss error: shmat sysClockptr");
+		perror("userProcess error: shmat sysClockptr");
 		return -1;
 	}
+	return 0;
+}
 
+static int setUPmsgQ(){
+	msgid = msgget(1220, 0666 | IPC_CREAT);
+	if (msgid == -1){
+		perror("userProcess error: msgid");
+		return -1;
+	}
 	return 0;
 }
 
@@ -39,8 +47,10 @@ int main(const int argc, char *const arv[]){
   srand((unsigned) time(&t));
 
 	setUpSHM();
+	setUPmsgQ();
 
 	printf("%d:%d seconds:nanoseconds in child process\n", sysClockptr->seconds, sysClockptr->nanoseconds);
 
 	removeSHM();
+	removeMsgQ();
 }
