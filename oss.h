@@ -1,6 +1,43 @@
 #ifndef OSS_H
 #define OSS_H
 
+#define MAX_PROCESS 18
+
+struct frameTable{
+	int frames[256];
+	int refFlag[256];
+	int dirtyBit[256];
+	int occupy[256];
+};
+
+struct userProcess{
+	int PIDcount[18];
+	int processNum[18];
+	int processAddy[18];
+	int readORwrite[18];
+	int processCount[18];
+	int procState[18];
+
+	struct frameTable table;
+} ;
+
+int PID;
+
+int runningProccess = 0;
+int PIDmain[18];
+int pitchforksMade = 0;
+int forkTimer[18];
+
+void randomForkTimer(){
+	int i;
+	for(i = 0; i < 18; i++){
+		forkTimer[i] = (rand() % 500000000 + 1);
+	}
+}
+
+static struct userProcess *shmPtr;
+int shmid;
+
 typedef struct sysClock{
 	unsigned int seconds;
 	unsigned int nanoseconds;
@@ -23,6 +60,14 @@ static void removeSHM(){
 
 	if(shmctl(shmClockid, IPC_RMID, NULL) == -1){
 		perror("error: shmctl shmClockid");
+	}
+
+	if(shmdt(shmPtr) == -1){
+		perror("error: shmdt shmPtr");
+	}
+
+	if(shmctl(shmid, IPC_RMID, NULL) == -1){
+		perror("error: shmctl shmid");
 	}
 }
 

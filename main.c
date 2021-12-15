@@ -29,6 +29,17 @@ static int setUpSHM(){
 		perror("oss error: shmat sysClockptr");
 		return -1;
 	}
+
+	shmid = shmget(7000, sizeof(struct userProcess), IPC_CREAT | IPC_EXCL | 0666);
+	if(shmid == -1){
+		perror("oss error: shmget shmid");
+		return -1;
+	}
+
+	shmPtr = shmat(shmid, NULL, 0);
+	if(shmPtr == (void *) -1){
+		perror("oss error: shmat shmPtr");
+	}
 	return 0;
 }
 
@@ -50,15 +61,10 @@ int main(void) {
   setUpSHM();
 	setUPmsgQ();
 
-	increaseClock(1, 1000000000);
-	printf("%d:%d seconds:nanoseconds in parent\n", sysClockptr->seconds, sysClockptr->nanoseconds);
-
 	pid = fork();
 	if(pid == 0){
 		execl("userProcess", "userProcess", NULL);
 	} else{
-		printf("this is parent\n");
-		
 	}
 
 	return 0;
